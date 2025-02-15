@@ -1,0 +1,27 @@
+<!-- projector.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Projector View</title>
+    <style>
+        body { font-size: 2em; text-align: center; }
+        #count { font-size: 3em; }
+    </style>
+</head>
+<body>
+    <h1>Event Status</h1>
+    <div id="count">0</div>
+    <div id="status">Waiting for participants</div>
+    <script>
+        const ws = new WebSocket(`ws://${window.location.host}/ws/projector`);
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            document.getElementById('count').textContent = data.userCount;
+            document.getElementById('status').textContent = data.eventStarted
+                ? 'EVENT STARTED!'
+                : 'Waiting for 50+ participants';
+        };
+    </script>
+</body>
+</html>

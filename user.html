@@ -1,0 +1,25 @@
+<!-- user.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Status</title>
+</head>
+<body>
+    <div id="status">Connecting...</div>
+    <script>
+        const ws = new WebSocket(`ws://${window.location.host}/ws/user`);
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = data.eventStarted 
+                ? 'Event Started!' 
+                : `Waiting for more users... (${data.userCount}/50)`;
+        };
+
+        ws.onerror = function(error) {
+            document.getElementById('status').textContent = 'Connection error';
+        };
+    </script>
+</body>
+</html>
