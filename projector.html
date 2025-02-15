@@ -3,123 +3,195 @@
 <head>
     <title>Projector View - MAGIS DIGITAL HOME</title>
     <style>
+        :root {
+            --primary: #ff4444;
+            --secondary: #1a73e8;
+            --accent: #4CAF50;
+            --highlight: #ffeb3b;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes particleMove {
+            from { transform: translateY(0) rotate(0deg); }
+            to { transform: translateY(-100vh) rotate(360deg); }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px var(--highlight); }
+            50% { text-shadow: 0 0 40px var(--highlight); }
+        }
+
+        @keyframes countPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
-            background: #1a1a1a;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             color: white;
+            min-height: 100vh;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .main-content {
             text-align: center;
+            z-index: 2;
         }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 0.5em;
-            color: #4CAF50; /* Green */
-            text-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
-        }
-
-        .content-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 2em; /* Space between QR code and count */
+        .count {
+            font-size: 6em;
+            font-weight: 900;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            color: var(--highlight);
+            animation: glow 1.5s ease-in-out infinite;
+            transition: all 0.3s ease;
         }
 
         .qr-container {
-            padding: 1em;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border-radius: 20px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
         }
 
         .qr-container img {
-            width: 150px; /* Slightly smaller for better balance */
-            height: 150px;
-            border-radius: 10px;
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            display: block;
+            margin: 0 auto;
         }
 
-        .qr-text {
-            margin-top: 0.5em;
-            font-size: 1em;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        #count {
-            font-size: 8em;
-            font-weight: bold;
-            margin: 0.2em 0;
-            color: #1a73e8; /* Blue */
-            text-shadow: 0 0 20px rgba(26, 115, 232, 0.4);
-        }
-
-        .status-message {
+        .status {
             font-size: 2em;
-            margin: 1em;
-            padding: 1em 2em;
+            padding: 1.5rem 3rem;
             border-radius: 50px;
+            margin: 2rem 0;
             background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: float 3s ease-in-out infinite;
             transition: all 0.5s ease;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
         }
 
-        .event-started {
-            background: #4CAF50; /* Green */
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+        .scan-text {
+            color: var(--highlight);
+            margin-top: 1rem;
+            font-size: 1.2em;
+            text-shadow: 0 0 10px var(--highlight);
         }
     </style>
 </head>
 <body>
-    <h1>MAGIS DIGITAL HOME</h1>
-
-    <!-- Content Wrapper for QR Code and Count -->
-    <div class="content-wrapper">
-        <!-- QR Code Section -->
+    <!-- Animated Background Particles -->
+    <div class="particle" style="top: 10%; left: 20%; width: 15px; height: 15px; animation: particleMove 8s linear infinite;"></div>
+    <div class="particle" style="top: 70%; left: 80%; width: 20px; height: 20px; animation: particleMove 10s linear infinite;"></div>
+    
+    <div class="main-content">
+        <h1 style="font-size: 3em; margin-bottom: 2rem;">MAGIS DIGITAL HOME</h1>
+        
         <div class="qr-container">
-            <img src="/image.png" alt="QR Code for User Page">
-            <div class="qr-text">Scan to join the event!</div>
+            <img src="/image.png" alt="Scan to Join">
+            <div class="scan-text">SCAN TO JOIN</div>
         </div>
 
-        <!-- Participant Count -->
-        <div id="count">0</div>
+        <div class="status" id="status">
+            Initializing...
+        </div>
     </div>
 
-    <!-- Status Message -->
-    <div id="status" class="status-message">
-        Waiting for participants
-    </div>
+    <div class="count" id="count">0</div>
 
     <script>
-        let reconnectTimeout;
-
-        function initProjectorWS() {
-            const ws = new WebSocket(`ws://${window.location.host}/ws/projector`);
-            
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                
-                // Update user count
-                document.getElementById('count').textContent = data.userCount;
-                
-                // Update status message
-                const statusEl = document.getElementById('status');
-                if (data.eventStarted) {
-                    statusEl.textContent = "🎉 EVENT STARTED!";
-                    statusEl.classList.add('event-started');
-                } else {
-                    statusEl.textContent = `Waiting for ${data.threshold - data.userCount} more participants`;
-                    statusEl.classList.remove('event-started');
-                }
-            };
-
-            ws.onclose = () => {
-                setTimeout(initProjectorWS, 3000);
-            };
+        // Add dynamic particles
+        function createParticles() {
+            const container = document.body;
+            for(let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.cssText = `
+                    top: ${Math.random() * 100}%;
+                    left: ${Math.random() * 100}%;
+                    width: ${Math.random() * 10 + 5}px;
+                    height: ${Math.random() * 10 + 5}px;
+                    animation-duration: ${Math.random() * 5 + 5}s;
+                `;
+                container.appendChild(particle);
+            }
         }
+        createParticles();
 
-        initProjectorWS();
+        // WebSocket handling
+        const countEl = document.getElementById('count');
+        const statusEl = document.getElementById('status');
+
+        const ws = new WebSocket(`ws://${window.location.host}/ws/projector`);
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            // Animate count update
+            countEl.classList.add('count-pulse');
+            setTimeout(() => {
+                countEl.classList.remove('count-pulse');
+            }, 500);
+
+            countEl.textContent = data.userCount;
+
+            if(data.eventStarted) {
+                statusEl.innerHTML = "🎉 EVENT LIVE!";
+                statusEl.style.background = "linear-gradient(45deg, #4CAF50, #FFEB3B)";
+            } else {
+                statusEl.innerHTML = `
+                    ${data.threshold - data.userCount} MORE NEEDED
+                    <div style="font-size: 0.7em; margin-top: 0.8rem;">
+                        Current Threshold: ${data.threshold}
+                    </div>
+                `;
+                statusEl.style.background = "rgba(255, 255, 255, 0.1)";
+            }
+        };
+
+        // Add custom pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            .count-pulse {
+                animation: countPulse 0.5s ease-out;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

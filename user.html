@@ -3,121 +3,217 @@
 <head>
     <title>MAGIS DIGITAL HOME</title>
     <style>
+        :root {
+            --primary: #ff4444; /* Red */
+            --secondary: #1a73e8; /* Blue */
+            --accent: #4CAF50; /* Green */
+            --highlight: #ffeb3b; /* Yellow */
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes particleMove {
+            from { transform: translateY(0) rotate(0deg); }
+            to { transform: translateY(-100vh) rotate(360deg); }
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
-            background: #1a1a1a;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             margin: 0;
-            text-align: center;
+            overflow: hidden;
+            position: relative;
         }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 0.5em;
-            color: #4CAF50; /* Green */
-            text-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
-        }
-
-        #count {
-            font-size: 6em;
-            font-weight: bold;
-            margin: 0.2em 0;
-            color: #1a73e8; /* Blue */
-            text-shadow: 0 0 20px rgba(26, 115, 232, 0.4);
-        }
-
-        .status-message {
-            font-size: 1.5em;
-            margin: 1em;
-            padding: 1em 2em;
-            border-radius: 50px;
+        .particle {
+            position: absolute;
             background: rgba(255, 255, 255, 0.1);
-            transition: all 0.5s ease;
+            border-radius: 50%;
+            pointer-events: none;
         }
 
-        .event-started {
-            background: #4CAF50; /* Green */
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .title {
+            font-size: 2.5em;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary), var(--highlight));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: float 3s ease-in-out infinite;
         }
 
         .progress-container {
-            width: 80%;
-            max-width: 400px;
-            height: 20px;
+            height: 25px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            margin: 1.5em 0;
+            border-radius: 15px;
+            margin: 2rem 0;
             overflow: hidden;
+            position: relative;
         }
 
         .progress-bar {
             height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             width: 0;
-            background: linear-gradient(90deg, #ff4444, #1a73e8); /* Red to Blue */
-            transition: width 0.5s ease;
+            transition: width 0.5s ease, box-shadow 0.3s ease;
+            position: relative;
         }
 
-        .loading {
-            animation: pulse 1.5s infinite;
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
+            animation: shine 2s infinite;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        .count {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 1rem 0;
+            color: var(--highlight);
+            text-shadow: 0 0 20px var(--highlight);
+        }
+
+        .status {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .status small {
+            font-size: 0.8em;
+            opacity: 0.9;
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        .status::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent);
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes shine {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <h1>MAGIS DIGITAL HOME</h1>
-    <div id="count">0</div>
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-    <div id="status" class="status-message">
-        <div class="loading">Connecting...</div>
+    <div class="particle" style="top: 10%; left: 20%; width: 15px; height: 15px; animation: particleMove 8s linear infinite;"></div>
+    <div class="particle" style="top: 70%; left: 80%; width: 20px; height: 20px; animation: particleMove 10s linear infinite;"></div>
+    
+    <div class="container">
+        <h1 class="title">MAGIS DIGITAL HOME</h1>
+        <div class="count" id="count">0</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="status" id="status">
+            <div class="loading">Connecting...</div>
+        </div>
     </div>
 
     <script>
+        function createParticles() {
+            const container = document.body;
+            for(let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.cssText = `
+                    top: ${Math.random() * 100}%;
+                    left: ${Math.random() * 100}%;
+                    width: ${Math.random() * 10 + 5}px;
+                    height: ${Math.random() * 10 + 5}px;
+                    animation-duration: ${Math.random() * 5 + 5}s;
+                `;
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
         const countEl = document.getElementById('count');
         const statusEl = document.getElementById('status');
         const progressBar = document.getElementById('progressBar');
 
         const ws = new WebSocket(`ws://${window.location.host}/ws/user`);
         
-        ws.onmessage = (event) => {
+        ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
-            
-            // Update user count
-            countEl.textContent = data.userCount;
-            
-            // Update progress bar
             const progress = Math.min((data.userCount / data.threshold) * 100, 100);
-            progressBar.style.width = `${progress}%`;
             
-            // Update status message
-            if (data.eventStarted) {
-                statusEl.innerHTML = "🎉 MAGIS DIGITAL HOME is now LIVE!";
-                statusEl.classList.add('event-started');
-            } else {
+            progressBar.style.width = `${progress}%`;
+            countEl.textContent = data.userCount;
+
+            if(data.eventStarted) {
                 statusEl.innerHTML = `
-                    Waiting for ${data.threshold - data.userCount} more participants
-                    <div style="font-size: 0.8em; margin-top: 0.5em;">
-                        Invite others to join and unlock the experience.
+                    <div style="position: relative; z-index: 1;">
+                        🎉 EVENT LIVE!<br>
+                        <small>Join the experience!</small>
                     </div>
                 `;
-                statusEl.classList.remove('event-started');
+                statusEl.style.background = 'linear-gradient(45deg, #4CAF50, #FFEB3B)';
+                progressBar.style.boxShadow = '0 0 30px rgba(76, 175, 80, 0.5)';
+            } else {
+                statusEl.innerHTML = `
+                    <div style="position: relative; z-index: 1;">
+                        ${data.threshold - data.userCount} spots remaining<br>
+                        <small>Invite friends to unlock!</small>
+                    </div>
+                `;
+                statusEl.style.background = 'rgba(255, 255, 255, 0.1)';
             }
-        };
-
-        ws.onerror = () => {
-            statusEl.innerHTML = '<div style="color: #ff4444;">Connection error</div>';
         };
     </script>
 </body>
