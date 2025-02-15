@@ -23,6 +23,30 @@
             text-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
         }
 
+        .content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 2em; /* Space between QR code and count */
+        }
+
+        .qr-container {
+            padding: 1em;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .qr-container img {
+            width: 150px; /* Slightly smaller for better balance */
+            height: 150px;
+            border-radius: 10px;
+        }
+
+        .qr-text {
+            margin-top: 0.5em;
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         #count {
             font-size: 8em;
             font-weight: bold;
@@ -49,7 +73,20 @@
 </head>
 <body>
     <h1>MAGIS DIGITAL HOME</h1>
-    <div id="count">0</div>
+
+    <!-- Content Wrapper for QR Code and Count -->
+    <div class="content-wrapper">
+        <!-- QR Code Section -->
+        <div class="qr-container">
+            <img src="/image.png" alt="QR Code for User Page">
+            <div class="qr-text">Scan to join the event!</div>
+        </div>
+
+        <!-- Participant Count -->
+        <div id="count">0</div>
+    </div>
+
+    <!-- Status Message -->
     <div id="status" class="status-message">
         Waiting for participants
     </div>

@@ -16,6 +16,8 @@ let state = {
   threshold: EVENT_THRESHOLD
 };
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Configure Express
 app.use(express.json());
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'user.html')));
