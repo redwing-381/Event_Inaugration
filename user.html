@@ -1,64 +1,70 @@
-<!-- user.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Event Status</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <title>MAGIS DIGITAL HOME</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background: #f0f2f5;
+            background: #1a1a1a;
+            color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
-            margin: 2rem;
-        }
-
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 90%;
+            margin: 0;
             text-align: center;
         }
 
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+            color: #4CAF50; /* Green */
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+        }
+
+        #count {
+            font-size: 6em;
+            font-weight: bold;
+            margin: 0.2em 0;
+            color: #1a73e8; /* Blue */
+            text-shadow: 0 0 20px rgba(26, 115, 232, 0.4);
+        }
+
+        .status-message {
+            font-size: 1.5em;
+            margin: 1em;
+            padding: 1em 2em;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+        }
+
+        .event-started {
+            background: #4CAF50; /* Green */
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+        }
+
         .progress-container {
-            height: 25px;
-            background: #e0e0e0;
-            border-radius: 12px;
-            margin: 2rem 0;
+            width: 80%;
+            max-width: 400px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 1.5em 0;
             overflow: hidden;
-            position: relative;
         }
 
         .progress-bar {
             height: 100%;
-            background: #4CAF50;
             width: 0;
-            transition: width 0.5s ease, background-color 0.3s;
-        }
-
-        .status-box {
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin: 1rem 0;
-            transition: all 0.5s ease;
-        }
-
-        .percentage {
-            font-size: 2.5rem;
-            color: #2c3e50;
-            margin: 1rem 0;
-            font-weight: 500;
+            background: linear-gradient(90deg, #ff4444, #1a73e8); /* Red to Blue */
+            transition: width 0.5s ease;
         }
 
         .loading {
             animation: pulse 1.5s infinite;
-            color: #7f8c8d;
         }
 
         @keyframes pulse {
@@ -66,86 +72,53 @@
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
-
-        .event-started {
-            background: #4CAF50;
-            color: white;
-            transform: scale(1.05);
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎉 Event Registration</h1>
-        <div class="percentage" id="percentage">0%</div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <div class="status-box" id="status">
-            <div class="loading">Connecting...</div>
-        </div>
-        <p>Invite friends to start the event faster!</p>
+    <h1>MAGIS DIGITAL HOME</h1>
+    <div id="count">0</div>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
     </div>
+    <div id="status" class="status-message">
+        <div class="loading">Connecting...</div>
+    </div>
+
     <script>
-        let reconnectTimeout;
-        let currentCount = 0;
+        const countEl = document.getElementById('count');
+        const statusEl = document.getElementById('status');
+        const progressBar = document.getElementById('progressBar');
 
-        function initWebSocket() {
-            const ws = new WebSocket(`ws://${window.location.host}/ws/user`);
+        const ws = new WebSocket(`ws://${window.location.host}/ws/user`);
+        
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
             
-            ws.onopen = () => {
-                document.getElementById('status').innerHTML = 
-                    `<div>Waiting for participants...</div>`;
-            };
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                currentCount = data.userCount;
-                updateDisplay(data);
-            };
-
-            ws.onclose = () => {
-                document.getElementById('status').innerHTML = 
-                    `<div class="loading">Reconnecting...</div>`;
-                reconnectTimeout = setTimeout(initWebSocket, 3000);
-            };
-
-            ws.onerror = () => ws.close();
-        }
-
-        function updateDisplay(data) {
-            const progress = Math.min((currentCount / 50) * 100, 100);
-            const percentageEl = document.getElementById('percentage');
-            const progressBar = document.getElementById('progressBar');
-            const statusEl = document.getElementById('status');
-
-            // Animate progress
+            // Update user count
+            countEl.textContent = data.userCount;
+            
+            // Update progress bar
+            const progress = Math.min((data.userCount / data.threshold) * 100, 100);
             progressBar.style.width = `${progress}%`;
-            percentageEl.textContent = `${Math.floor(progress)}%`;
-
-            // Update status
-            if(data.eventStarted) {
-                statusEl.innerHTML = `<div class="event-started">🎉 Event Started!</div>`;
-                progressBar.style.backgroundColor = '#27ae60';
+            
+            // Update status message
+            if (data.eventStarted) {
+                statusEl.innerHTML = "🎉 MAGIS DIGITAL HOME is now LIVE!";
+                statusEl.classList.add('event-started');
             } else {
                 statusEl.innerHTML = `
-                    <div>
-                        ${currentCount} / 50 participants
-                        <br>
-                        <small>Keep sharing the link!</small>
+                    Waiting for ${data.threshold - data.userCount} more participants
+                    <div style="font-size: 0.8em; margin-top: 0.5em;">
+                        Invite others to join and unlock the experience.
                     </div>
                 `;
-                progressBar.style.backgroundColor = progress >= 80 ? '#f1c40f' : '#3498db';
+                statusEl.classList.remove('event-started');
             }
-        }
+        };
 
-        // Initial connection
-        if(!window.WebSocket) {
-            document.getElementById('status').innerHTML = 
-                '<div style="color: red">Browser not supported!</div>';
-        } else {
-            initWebSocket();
-        }
+        ws.onerror = () => {
+            statusEl.innerHTML = '<div style="color: #ff4444;">Connection error</div>';
+        };
     </script>
 </body>
 </html>

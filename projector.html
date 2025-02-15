@@ -1,8 +1,7 @@
-<!-- projector.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Projector View</title>
+    <title>Projector View - MAGIS DIGITAL HOME</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -17,16 +16,23 @@
             text-align: center;
         }
 
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+            color: #4CAF50; /* Green */
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+        }
+
         #count {
             font-size: 8em;
             font-weight: bold;
             margin: 0.2em 0;
-            color: #4CAF50;
-            text-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+            color: #1a73e8; /* Blue */
+            text-shadow: 0 0 20px rgba(26, 115, 232, 0.4);
         }
 
         .status-message {
-            font-size: 2.5em;
+            font-size: 2em;
             margin: 1em;
             padding: 1em 2em;
             border-radius: 50px;
@@ -35,14 +41,14 @@
         }
 
         .event-started {
-            background: #4CAF50;
+            background: #4CAF50; /* Green */
             transform: scale(1.1);
             box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
         }
     </style>
 </head>
 <body>
-    <h1>Live Event Status</h1>
+    <h1>MAGIS DIGITAL HOME</h1>
     <div id="count">0</div>
     <div id="status" class="status-message">
         Waiting for participants
@@ -56,16 +62,19 @@
             
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                document.getElementById('count').textContent = data.userCount;
-                const statusEl = document.getElementById('status');
                 
-                statusEl.textContent = data.eventStarted 
-                    ? "EVENT STARTED!" 
-                    : `Waiting for ${50 - data.userCount} more participants`;
-                    
-                statusEl.className = `status-message ${
-                    data.eventStarted ? 'event-started' : ''
-                }`;
+                // Update user count
+                document.getElementById('count').textContent = data.userCount;
+                
+                // Update status message
+                const statusEl = document.getElementById('status');
+                if (data.eventStarted) {
+                    statusEl.textContent = "🎉 EVENT STARTED!";
+                    statusEl.classList.add('event-started');
+                } else {
+                    statusEl.textContent = `Waiting for ${data.threshold - data.userCount} more participants`;
+                    statusEl.classList.remove('event-started');
+                }
             };
 
             ws.onclose = () => {
