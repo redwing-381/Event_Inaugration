@@ -31,6 +31,7 @@
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
+            color: white;
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
@@ -86,26 +87,24 @@
             position: relative;
         }
 
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.3), 
-                transparent);
-            animation: shine 2s infinite;
-        }
-
         .count {
             font-size: 4em;
             font-weight: bold;
             margin: 1rem 0;
             color: var(--highlight);
             text-shadow: 0 0 20px var(--highlight);
+        }
+
+        .logo-container {
+            display: none;
+            margin: 2rem 0;
+        }
+
+        .logo-container img {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            animation: float 3s ease-in-out infinite;
         }
 
         .status {
@@ -156,16 +155,25 @@
     
     <div class="container">
         <h1 class="title">MAGIS DIGITAL HOME</h1>
+        
+        <!-- Before Event Starts -->
         <div class="count" id="count">0</div>
-        <div class="progress-container">
+        <div class="progress-container" id="progressContainer">
             <div class="progress-bar" id="progressBar"></div>
         </div>
+
+        <!-- After Event Starts -->
+        <div class="logo-container" id="logoContainer">
+            <img src="/logo.png" alt="Event Logo">
+        </div>
+
         <div class="status" id="status">
             <div class="loading">Connecting...</div>
         </div>
     </div>
 
     <script>
+        // Add dynamic particles
         function createParticles() {
             const container = document.body;
             for(let i = 0; i < 15; i++) {
@@ -185,6 +193,8 @@
 
         const countEl = document.getElementById('count');
         const statusEl = document.getElementById('status');
+        const progressContainer = document.getElementById('progressContainer');
+        const logoContainer = document.getElementById('logoContainer');
         const progressBar = document.getElementById('progressBar');
 
         const ws = new WebSocket(`ws://${window.location.host}/ws/user`);
@@ -197,15 +207,21 @@
             countEl.textContent = data.userCount;
 
             if(data.eventStarted) {
+                countEl.style.display = 'none';
+                progressContainer.style.display = 'none';
+                logoContainer.style.display = 'block';
                 statusEl.innerHTML = `
                     <div style="position: relative; z-index: 1;">
-                        🎉 EVENT LIVE!<br>
-                        <small>Join the experience!</small>
+                        🎉 EVENT LIVE! 🎉<br>
+                        <small>Space for youth empowerment</small>
                     </div>
                 `;
                 statusEl.style.background = 'linear-gradient(45deg, #4CAF50, #FFEB3B)';
                 progressBar.style.boxShadow = '0 0 30px rgba(76, 175, 80, 0.5)';
             } else {
+                countEl.style.display = 'block';
+                progressContainer.style.display = 'block';
+                logoContainer.style.display = 'none';
                 statusEl.innerHTML = `
                     <div style="position: relative; z-index: 1;">
                         ${data.threshold - data.userCount} spots remaining<br>

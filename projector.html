@@ -27,14 +27,18 @@
         }
 
         @keyframes glow {
-            0%, 100% { text-shadow: 0 0 20px var(--highlight); }
-            50% { text-shadow: 0 0 40px var(--highlight); }
+            0%, 100% { text-shadow: 0 0 10px var(--highlight); }
+            50% { text-shadow: 0 0 30px var(--highlight); }
         }
 
         @keyframes countPulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
         }
 
         body {
@@ -87,8 +91,27 @@
         }
 
         .qr-container img {
-            width: 200px;
-            height: 200px;
+            width: 300px;
+            height: 300px;
+            border-radius: 15px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .logo-container {
+            display: none;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-container img {
+            width: 300px;
+            height: 300px;
             border-radius: 15px;
             display: block;
             margin: 0 auto;
@@ -104,6 +127,22 @@
             animation: float 3s ease-in-out infinite;
             transition: all 0.5s ease;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent);
+            animation: rotate 4s linear infinite;
         }
 
         .scan-text {
@@ -122,11 +161,18 @@
     <div class="main-content">
         <h1 style="font-size: 3em; margin-bottom: 2rem;">MAGIS DIGITAL HOME</h1>
         
-        <div class="qr-container">
+        <!-- QR Code (Before Event Starts) -->
+        <div class="qr-container" id="qrContainer">
             <img src="/image.png" alt="Scan to Join">
             <div class="scan-text">SCAN TO JOIN</div>
         </div>
 
+        <!-- Logo (After Event Starts) -->
+        <div class="logo-container" id="logoContainer">
+            <img src="/logo.png" alt="Event Logo">
+        </div>
+
+        <!-- Status Bar -->
         <div class="status" id="status">
             Initializing...
         </div>
@@ -156,6 +202,8 @@
         // WebSocket handling
         const countEl = document.getElementById('count');
         const statusEl = document.getElementById('status');
+        const qrContainer = document.getElementById('qrContainer');
+        const logoContainer = document.getElementById('logoContainer');
 
         const ws = new WebSocket(`ws://${window.location.host}/ws/projector`);
         
@@ -171,13 +219,17 @@
             countEl.textContent = data.userCount;
 
             if(data.eventStarted) {
-                statusEl.innerHTML = "🎉 EVENT LIVE!";
+                qrContainer.style.display = 'none';
+                logoContainer.style.display = 'block';
+                statusEl.innerHTML = "🎉 EVENT LIVE! 🎉";
                 statusEl.style.background = "linear-gradient(45deg, #4CAF50, #FFEB3B)";
             } else {
+                qrContainer.style.display = 'block';
+                logoContainer.style.display = 'none';
                 statusEl.innerHTML = `
-                    ${data.threshold - data.userCount} MORE NEEDED
+                    Are you ready?
                     <div style="font-size: 0.7em; margin-top: 0.8rem;">
-                        Current Threshold: ${data.threshold}
+                        Space for youth empowerment
                     </div>
                 `;
                 statusEl.style.background = "rgba(255, 255, 255, 0.1)";
