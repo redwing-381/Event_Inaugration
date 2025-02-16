@@ -197,7 +197,7 @@
         const logoContainer = document.getElementById('logoContainer');
         const progressBar = document.getElementById('progressBar');
 
-        const ws = new WebSocket(`ws://magis-digital-home.vercel.app/ws/user`);
+        const ws = new WebSocket(`wss://event-inaugration1.onrender.com/wss/user`);
         
         ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
