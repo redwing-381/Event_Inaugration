@@ -205,7 +205,7 @@
         const qrContainer = document.getElementById('qrContainer');
         const logoContainer = document.getElementById('logoContainer');
 
-        const ws = new WebSocket(`ws://${window.location.host}/ws/projector`);
+        const ws = new WebSocket(`ws://magis-digital-home.vercel.app/ws/projector`);
         
         ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
